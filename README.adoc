@@ -1,0 +1,134 @@
+# Insurance Observability
+
+## Overview
+
+Insurance Observability is an evaluation project that explores different Observability implementations in the Java ecosystem. The goal is to understand how various tools and frameworks—such as OpenTelemetry, Micrometer, and different logging and tracing solutions—can be integrated into insurance-related software architectures.
+
+This project serves as a practical guide for developers and architects who want to compare different Observability approaches, experiment with integrations, and learn best practices for monitoring, logging, and tracing in Java applications.
+
+### Application Flow
+
+1. The Quote App allows users to create insurance quotes. Once the quote is accepted by the customer, the application sends an HTTP request to the Policy App, which issues the corresponding policy. 
+2. If the policy creation is successful, a message is sent to the "policy-created" Kafka topic. 
+3. The Account App listens for this event and generates booking records. 
+
+### Key Topics Covered
+
+* Tracing, Logging, and Metrics: Understanding the differences and use cases
+* Comparison of OpenTelemetry and Micrometer Tracing
+* Instrumentation strategies: Manual vs. automatic instrumentation
+* Backend integrations: Loki, Prometheus, Tempo, Jaeger, Zipkin, and others
+* Using OpenTelemetry Java Agent for zero-code instrumentation
+
+### Getting Started
+
+#### Prerequisites
+
+* Java 21+
+* Docker and Docker Compose (for running backend services)
+
+#### Running the Project
+
+#### 0. host.docker.internal
+
+Ensure you have `host.docker.internal` pointed to 127.0.0.1:
+
+```shell
+echo "127.0.0.1 host.docker.internal" | sudo tee -a /etc/hosts
+```
+
+#### 1. Docker containers
+
+Spinning up the observability docker containers:
+
+```shell
+docker compose -f docker/docker-compose-infra.yaml -f docker/docker-compose-observability.yaml up -d
+```
+
+#### 2. Build application
+
+```shell
+./build.sh
+```
+
+#### 3. Start application
+
+```shell
+docker compose -f docker/docker-compose-apps.yaml up --build -d
+```
+
+#### 4. Open Apps
+
+```shell
+open http://host.docker.internal:9400/quote http://host.docker.internal:9401/policy http://host.docker.internal:9402/account
+```
+
+
+#### 5. Open Grafana
+
+```shell
+open http://host.docker.internal:3000
+```
+
+* Username: `admin`
+* Password: `admin`
+
+#### 6. Creating Random Quotes
+
+```shell
+watch -n 5 'curl -s -X POST --location http://host.docker.internal:9400/quote/api/quotes/random | jq'
+```
+
+## Quote App
+
+The Quote App consists of two modules: `quote-core` and `quote-app`.  
+- `quote-core` represents the core product, containing the business logic while minimizing infrastructural dependencies.  
+- `quote-app` is the actual application that integrates `quote-core` and handles infrastructural concerns and OpenTelemetry instrumentation.
+
+In the Quote App, we use the [OpenTelemetry Spring Boot Starter](https://opentelemetry.io/docs/zero-code/java/spring-boot-starter/) to configure automatic OpenTelemetry instrumentation. This allows us to enable tracing without requiring the OpenTelemetry Java Agent.
+
+#### Automatic Instrumentation
+We include the following dependency in the application:
+
+```gradle
+implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter:2.13.3'
+```
+
+This provides automatic instrumentation for:
+- Outgoing HTTP requests
+- JDBC calls
+
+By including this dependency in the target application, OpenTelemetry traces are automatically captured and sent to the configured backend.
+
+#### Manual Custom Spans
+Additionally, in `quote-core`, we include the following (optional) dependency:
+
+```gradle
+implementation 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:1.27.0'
+```
+
+Using this dependency, we can annotate specific methods with `@WithSpan` to create custom spans, providing more granular tracing where needed.
+
+##### Example: Creating a Custom Span
+
+```java
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import org.springframework.stereotype.Service;
+
+@Service
+public class QuoteService {
+
+    @WithSpan("Accept Quote") // [optional] creating a custom span for better visibility
+    public Quote accept(Id<Quote> quoteId) {
+        // ...
+    }
+}
+```
+
+----
+include::quote-core/quote-core/src/main/java/com/insurance/quote/view/quote/QuoteListView.java[tags=test]
+----
+
+Here, the `@WithSpan` annotation ensures that the `generateQuote` method is traced with its own span, making it easier to track its execution within OpenTelemetry.
+
+This approach is particularly useful for tracing key business logic operations that are not automatically captured by the Spring Boot Starter’s default instrumentation.

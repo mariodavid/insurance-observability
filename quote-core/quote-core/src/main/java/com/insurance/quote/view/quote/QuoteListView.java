@@ -66,6 +66,7 @@ public class QuoteListView extends StandardListView<Quote> {
     @Subscribe("quotesDataGrid.acceptAction")
     public void onQuotesDataGridAcceptAction(final ActionPerformedEvent event) {
 
+        // tag::test[]
         // programmatic creation of span as Vaadin's /POST span is too generic
         Tracer tracer = openTelemetry.getTracer(QuoteListView.class.getName());
         Span span = tracer.spanBuilder("UI: accept quote action").startSpan();
@@ -83,6 +84,8 @@ public class QuoteListView extends StandardListView<Quote> {
         finally {
             span.end();
         }
+
+        // end::test[]
     }
 
     @Supply(to = "quotesDataGrid.createdPolicyNo", subject = "renderer")
