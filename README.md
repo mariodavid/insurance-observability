@@ -125,10 +125,32 @@ public class QuoteService {
 }
 ```
 
-----
-include::quote-core/quote-core/src/main/java/com/insurance/quote/view/quote/QuoteListView.java[tags=test]
-----
+see: [quote-core: Quote Service](quote-core/quote-core/src/main/java/com/insurance/quote/app/QuoteService.java)
 
 Here, the `@WithSpan` annotation ensures that the `generateQuote` method is traced with its own span, making it easier to track its execution within OpenTelemetry.
 
 This approach is particularly useful for tracing key business logic operations that are not automatically captured by the Spring Boot Starter’s default instrumentation.
+
+##### Example: Creating a Span Programmatically
+
+In some cases, such as when using frameworks like Vaadin, automatic instrumentation might not capture relevant spans properly. In such scenarios, spans can be created programmatically using OpenTelemetry's `Tracer` API.
+
+```java
+@Subscribe("quotesDataGrid.acceptAction")
+public void onQuotesDataGridAcceptAction(final ActionPerformedEvent event) {
+    
+    Tracer tracer = openTelemetry.getTracer(QuoteListView.class.getName());
+    Span span = tracer.spanBuilder("UI: accept quote action").startSpan();
+    
+    try {
+        // ...
+    }
+    finally {
+        span.end();
+    }
+}
+```
+
+see: [quote-core: Quote List View](quote-core/quote-core/src/main/java/com/insurance/quote/view/quote/QuoteListView.java)
+
+This approach ensures that UI-triggered interactions, such as accepting a quote, are properly traced and visible in OpenTelemetry.
