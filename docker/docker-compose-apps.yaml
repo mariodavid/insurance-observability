@@ -1,0 +1,55 @@
+services:
+  policy:
+    build:
+      context: ../policy-app
+      dockerfile: Dockerfile
+    ports:
+      - "9401:9401"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      MAIN_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/policy
+      MAIN_DATASOURCE_USERNAME: postgres
+      MAIN_DATASOURCE_PASSWORD: postgres
+      OTEL_SERVICE_NAME: policy-app
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
+      OTEL_JAVAAGENT_DEBUG: false
+      OTEL_INSTRUMENTATION_EXCLUDE_CLASSES: io.jmix.flowui.backgroundtask.BackgroundTaskWatchDogScheduleConfigurer*,io.jmix.core.impl.TriggerFileProcessorScheduleConfigurer*
+      OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED: true
+      spring.kafka.bootstrap-servers: http://host.docker.internal:9092
+
+  quote:
+    build:
+      context: ../quote-app
+      dockerfile: Dockerfile
+    environment:
+      MAIN_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/quote
+      MAIN_DATASOURCE_USERNAME: postgres
+      MAIN_DATASOURCE_PASSWORD: postgres
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
+    ports:
+      - "9400:9400"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  account:
+    build:
+      context: ../account-app
+      dockerfile: Dockerfile
+    environment:
+      MAIN_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/account
+      MAIN_DATASOURCE_USERNAME: postgres
+      MAIN_DATASOURCE_PASSWORD: postgres
+      management.otlp.metrics.export.url: http://host.docker.internal:4318/v1/metrics
+      management.otlp.logging.endpoint: http://host.docker.internal:4318/v1/logs
+      management.otlp.tracing.endpoint: http://host.docker.internal:4318/v1/traces
+      spring.kafka.bootstrap-servers: http://host.docker.internal:9092
+    ports:
+      - "9402:9402"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  default:
+    name: insurance-observability

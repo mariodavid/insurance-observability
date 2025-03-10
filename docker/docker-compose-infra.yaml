@@ -1,0 +1,38 @@
+services:
+  postgres:
+    build:
+      context: ./postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+
+  redpanda:
+    image: redpandadata/redpanda:v24.3.2
+    command:
+      - redpanda start
+      - --kafka-addr internal://0.0.0.0:9093,external://0.0.0.0:9092
+      - --advertise-kafka-addr internal://host.docker.internal:9092,external://host.docker.internal:9092
+      - --smp 1
+      - --mode dev-container
+      - --memory 512M
+    healthcheck:
+      test: [ "CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    ports:
+      - "9092:9092"
+
+  redpanda-console:
+    image: redpandadata/console:v2.7.2
+    environment:
+      KAFKA_BROKERS: redpanda:9093
+    ports:
+      - "9403:8080"
+
+networks:
+  default:
+    name: insurance-observability

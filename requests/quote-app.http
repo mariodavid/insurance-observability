@@ -1,4 +1,4 @@
 
-POST http://localhost:9400/quote/api/quotes/random
+POST http://host.docker.internal:9400/quote/api/quotes/random
 
 ###

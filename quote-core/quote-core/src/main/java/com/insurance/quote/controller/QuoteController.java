@@ -73,7 +73,6 @@ public class QuoteController {
     private Quote generateRandomQuote() {
         Quote quote = dataManager.create(Quote.class);
 
-
         long quoteSequenceNumber = sequences.createNextValue(Sequence.withName("quote"));
         LocalDate today = timeSource.now().toLocalDate();
         quote.setQuoteNo("%s-%s".formatted(today.getYear(),quoteSequenceNumber));

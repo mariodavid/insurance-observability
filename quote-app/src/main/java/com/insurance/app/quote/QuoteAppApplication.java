@@ -21,7 +21,7 @@ import javax.sql.DataSource;
 
 @Push
 @Theme(value = "quote-app")
-@PWA(name = "Quote App", shortName = "Quote App")
+//@PWA(name = "Quote App", shortName = "Quote App")
 @SpringBootApplication
 public class QuoteAppApplication implements AppShellConfigurator {
 
