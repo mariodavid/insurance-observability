@@ -1,0 +1,90 @@
+services:
+  grafana:
+    image: grafana/grafana:11.5.2
+    ports:
+      - "3000:3000"
+    volumes: 
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/grafana-datasources.yaml
+      - ./grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/grafana-dashboards.yaml
+      - ./otel-http-dashboard.json:/etc/grafana/otel-http-dashboard.json
+      - ./spring-http-dashboard.json:/etc/grafana/spring-http-dashboard.json
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    ports:
+      - "9090:9090"
+    command:
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+      - --config.file=/etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  tempo:
+    image: grafana/tempo:2.7.1
+
+    ports:
+      - "3200:3200"
+      - "4417:4417"
+      - "4418:4418"
+      - "9096:9096"
+    volumes:
+      - ./tempo-config.yaml:/config.yaml
+    command:
+      - --config.file=/config.yaml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  loki:
+    image: grafana/loki:3.4
+    ports:
+      - "3100:3100"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.79.0
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./otelcol-config.yaml:/config.yaml
+    command:
+      - --config=file:/config.yaml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgres:
+    build:
+      context: ./postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+
+  redpanda:
+    image: redpandadata/redpanda:v24.3.2
+    command:
+      - redpanda start
+      - --kafka-addr internal://0.0.0.0:9093,external://0.0.0.0:9092
+      - --advertise-kafka-addr internal://host.docker.internal:9092,external://host.docker.internal:9092
+      - --smp 1
+      - --mode dev-container
+      - --memory 512M
+    healthcheck:
+      test: [ "CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    ports:
+      - "9092:9092"
+
+  redpanda-console:
+    image: redpandadata/console:v2.7.2
+    environment:
+      KAFKA_BROKERS: redpanda:9093
+    ports:
+      - "9403:8080"
+
+networks:
+  default:
+    name: insurance-observability

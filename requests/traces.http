@@ -1,0 +1,76 @@
+### Sending a manual Trace to OTEL-Collector
+
+# curl -v -X POST http://localhost:4318/v1/traces
+#  -H "Content-Type: application/json"
+#  -d '{
+#    "resourceSpans": [
+#      {
+#        "resource": {
+#          "attributes": [
+#            {
+#              "key": "service.name",
+#              "value": { "stringValue": "debug-test-service" }
+#            }
+#          ]
+#        },
+#        "scopeSpans": [
+#          {
+#            "scope": { "name": "manual-test" },
+#            "spans": [
+#              {
+#                "traceId": "1a2b3c4d5e6f708192a3b4c5d6e7f809",
+#                "spanId": "a1b2c3d4e5f67890",
+#                "name": "manual-span",
+#                "kind": 1,
+#                "startTimeUnixNano": "1700000000000000000",
+#                "endTimeUnixNano": "1700000001000000000",
+#                "status": { "code": 0 }
+#              }
+#            ]
+#          }
+#        ]
+#      }
+#    ]
+#  }'
+POST http://localhost:4318/v1/traces
+Content-Type: application/json
+
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "debug-test-service"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "manual-test"
+          },
+          "spans": [
+            {
+              "traceId": "1a2b3c4d5e6f708192a3b4c5d6e7f809",
+              "spanId": "a1b2c3d4e5f67890",
+              "name": "manual-span",
+              "kind": 1,
+              "startTimeUnixNano": "1700000000000000000",
+              "endTimeUnixNano": "1700000001000000000",
+              "status": {
+                "code": 0
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+###
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<menu-config xmlns="http://jmix.io/schema/flowui/menu">
+
+    <item bean="common_quoteAppNavigation" beanMethod="navigate"
+          description="msg://com.insurance.common/menu_config.QuoteAppNavigation_navigate.description"
+          title="msg://com.insurance.common/menu_config.QuoteAppNavigation_navigate.title"/>
+    <item view="policy_Policy.list" title="msg://com.insurance.policy.view.policy/policyListView.title"/>
+    <item bean="common_accountAppNavigation" beanMethod="navigate"
+          description="msg://com.insurance.common/menu_config.AccountAppNavigation_navigate.description"
+          title="msg://com.insurance.common/menu_config.AccountAppNavigation_navigate.title"/>
+</menu-config>

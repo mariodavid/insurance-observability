@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://accountDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="accountDc"
+                  class="com.insurance.account.entity.Account">
+            <fetchPlan extends="_base">
+                <property name="documents" fetchPlan="_base"/>
+            </fetchPlan>
+            <loader id="accountDl"/>
+            <collection id="documentsDc" property="documents"/>
+        </instance>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="saveAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout>
+        <formLayout id="form" dataContainer="accountDc">
+            <responsiveSteps>
+                <responsiveStep minWidth="0" columns="1"/>
+                <responsiveStep minWidth="40em" columns="2"/>
+            </responsiveSteps>
+            <textField id="accountNoField" property="accountNo"/>
+            <textField id="accountBalanceField" property="accountBalance"/>
+        </formLayout>
+        <h3 text="msg://com.insurance.account.entity/Account.documents" />
+        <dataGrid id="documentsDataGrid" dataContainer="documentsDc" width="100%" height="100%">
+            <columns>
+                <column property="documentDate"/>
+                <column property="amount"/>
+                <column property="type"/>
+                <column property="description"/>
+            </columns>
+        </dataGrid>
+        <hbox id="detailActions">
+            <button id="saveAndCloseButton" action="saveAction"/>
+            <button id="closeButton" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>

@@ -1,0 +1,42 @@
+
+### http POST http://localhost:9401/policy/api/policies quoteNo=123 insuranceProductId=HOME_CONTENT_DELUXE_2024_01 effectiveDate=2024-01-01 premium=100.80 paymentFrequencyId=YEARLY
+
+POST http://localhost:9401/policy/api/policies
+Content-Type: application/json
+
+{
+  "quoteNo": "123",
+  "insuranceProductId": "HOME_CONTENT_DELUXE_2024_01",
+  "effectiveDate": "2024-01-01",
+  "premium": 100.80,
+  "paymentFrequencyId": "YEARLY"
+}
+
+###
+
+GET http://localhost:9402/account/api/accounts/HC-2025-000015?effectiveDate=2025-04-01
+
+
+###
+
+GET http://localhost:9402/account/api/accounts/invalid-account-no?effectiveDate=2025-04-01
+
+
+
+###
+
+GET http://localhost:9402/account/actuator/prometheus
+
+###
+
+GET http://localhost:9402/account/actuator/metrics
+###
+
+GET http://localhost:9402/account/actuator/metrics/account.balance.not_found
+
+###
+
+GET http://localhost:9402/account/actuator/info
+
+
+

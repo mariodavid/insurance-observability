@@ -1,0 +1,4 @@
+
+POST http://localhost:9400/quote/api/quotes/random
+
+###

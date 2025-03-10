@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Quote-app Jmix Application" type="JmixRunApplication">
+    <option name="MAIN_CLASS_NAME" value="com.insurance.app.quote.QuoteAppApplication" />
+    <module name="quote-app.main" />
+    <shortenClasspath name="ARGS_FILE" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/quote-app" />
+    <method v="2">
+      <option name="JmixCleanConf" enabled="false" />
+      <option name="JmixCheckIncludes" enabled="false" />
+      <option name="JmixSyncDb" enabled="false" />
+      <option name="JmixAssemble" enabled="false" />
+    </method>
+  </configuration>
+</component>

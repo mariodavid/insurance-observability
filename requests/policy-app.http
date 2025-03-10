@@ -1,0 +1,18 @@
+
+### http POST http://localhost:9401/policy/api/policies quoteNo=123 insuranceProductId=HOME_CONTENT_DELUXE_2024_01 effectiveDate=2024-01-01 premium=100.80 paymentFrequencyId=YEARLY
+
+POST http://localhost:9401/policy/api/policies
+Content-Type: application/json
+
+{
+  "quoteNo": "123",
+  "insuranceProductId": "HOME_CONTENT_DELUXE_2024_01",
+  "effectiveDate": "2024-01-01",
+  "premium": 100.80,
+  "paymentFrequencyId": "YEARLY"
+}
+
+###
+
+
+GET http://localhost:9401/policy/api/policies/01956bf9-c000-7f96-99bc-fc73e540a317

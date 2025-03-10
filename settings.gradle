@@ -1,0 +1,10 @@
+rootProject.name = 'insurance-observability'
+
+includeBuild 'policy-core'
+includeBuild 'common'
+includeBuild 'policy-app'
+includeBuild 'quote-core'
+includeBuild 'quote-app'
+includeBuild 'product-core'
+includeBuild 'account-core'
+includeBuild 'account-app'
