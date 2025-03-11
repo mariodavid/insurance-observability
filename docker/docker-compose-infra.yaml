@@ -32,6 +32,12 @@ services:
       KAFKA_BROKERS: redpanda:9093
     ports:
       - "9403:8080"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/api/brokers" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
 
 networks:
   default:

@@ -8,6 +8,14 @@ services:
       - ./grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/grafana-dashboards.yaml
       - ./otel-http-dashboard.json:/etc/grafana/otel-http-dashboard.json
       - ./spring-http-dashboard.json:/etc/grafana/spring-http-dashboard.json
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:3000/api/health" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+
   prometheus:
     image: prom/prometheus:v3.2.1
     ports:
@@ -18,9 +26,15 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:9090" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
   tempo:
     image: grafana/tempo:2.7.1
-
     ports:
       - "3200:3200"
       - "4417:4417"
@@ -32,18 +46,32 @@ services:
       - --config.file=/config.yaml
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:3200/ready" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
   loki:
     image: grafana/loki:3.4
     ports:
       - "3100:3100"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:3100/ready" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
 
   collector:
-    image: otel/opentelemetry-collector-contrib:0.79.0
+    image: otel/opentelemetry-collector-contrib:0.121.0
     ports:
       - "4317:4317"
       - "4318:4318"
+      - "13133:13133"
     volumes:
       - ./otelcol-config.yaml:/config.yaml
     command:

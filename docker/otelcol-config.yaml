@@ -14,27 +14,18 @@ exporters:
     endpoint: http://host.docker.internal:4418
   loki:
     endpoint: http://host.docker.internal:3100/loki/api/v1/push
-  logging/metrics:
-    verbosity: detailed
-  logging/traces:
-    verbosity: detailed
-  logging/logs:
-    verbosity: detailed
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      #exporters: [otlphttp]
-      exporters: [otlphttp,logging/traces]
+      exporters: [otlphttp]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      #exporters: [prometheusremotewrite]
-      exporters: [prometheusremotewrite,logging/metrics]
+      exporters: [prometheusremotewrite]
     logs:
       receivers: [otlp]
       processors: [batch]
-      #exporters: [loki]
-      exporters: [loki,logging/logs]
+      exporters: [loki]
