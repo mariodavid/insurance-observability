@@ -20,6 +20,28 @@ This project serves as a practical guide for developers and architects who want 
 * Backend integrations: Loki, Prometheus, Tempo, Jaeger, Zipkin, and others
 * Using OpenTelemetry Java Agent for zero-code instrumentation
 
+### Observability Stack
+
+In this example we use the Grafana Stack for observability, which includes:
+
+- Loki for log aggregation
+- Prometheus for metrics collection
+- Tempo for distributed tracing
+
+Grafana provides a unified dashboard to visualize logs, metrics, and traces, enabling efficient monitoring and troubleshooting.
+
+This observability stack is just an example. By using the OpenTelemetry Collector, we gain the flexibility to send telemetry data to any backend that supports the OTLP protocol, including services like Datadog, Splunk, Honeycomb, and many others. See also: https://opentelemetry.io/ecosystem/vendors/.
+
+#### Open Telemetry Collector
+
+All telemetry data flows through the OpenTelemetry Collector, which acts as an intermediary between applications and the backend observability systems.
+
+- Logs from applications are sent to Loki.
+- Metrics are collected using Prometheus.
+- Traces are processed and stored in Tempo.
+
+Alternatively, applications can send telemetry data directly to the observability backend without using the OpenTelemetry Collector, depending on the specific requirements and infrastructure.
+
 ### Getting Started
 
 #### Prerequisites
@@ -100,6 +122,25 @@ This provides automatic instrumentation for:
 
 By including this dependency in the target application, OpenTelemetry traces are automatically captured and sent to the configured backend.
 
+#### OpenTelemetry Spring Boot Starter Features
+
+The OpenTelemetry Spring Boot Starter includes support for:
+- Traces: Automatic and manual span creation.
+- Metrics: Capturing system and application metrics.
+- Logging: Integration with Logback, adding a special OpenTelemetry appender.
+
+The starter automatically configures Logback and enriches logs with tracing context, ensuring that traces, metrics, and logs are all correlated within the observability backend.
+
+#### Disabling Specific Auto Instrumentations
+
+In some cases, you might want to disable certain automatic instrumentations provided by the OpenTelemetry Spring Boot Starter. This can be done using application properties. For example, to disable JDBC instrumentation:
+
+```properties
+otel.instrumentation.jdbc.enabled=false
+```
+
+This allows for more fine-grained control over what is instrumented automatically.
+
 #### Manual Custom Spans
 Additionally, in `quote-core`, we include the following (optional) dependency:
 
@@ -154,3 +195,113 @@ public void onQuotesDataGridAcceptAction(final ActionPerformedEvent event) {
 see: [quote-core: Quote List View](quote-core/quote-core/src/main/java/com/insurance/quote/view/quote/QuoteListView.java)
 
 This approach ensures that UI-triggered interactions, such as accepting a quote, are properly traced and visible in OpenTelemetry.
+
+
+### Policy App
+
+The Policy App is instrumented using the OpenTelemetry Java Agent, which allows automatic instrumentation without requiring dependencies in the source code. Instead, the agent is attached at runtime and modifies the bytecode dynamically. The OpenTelemetry Java Agent performs bytecode manipulation to inject instrumentation.
+
+The agent automatically captures:
+
+* Logs
+* Metrics
+* Traces
+
+#### Configuration
+To use the agent, the application needs to be started with the `-javaagent` flag:
+
+```shell
+CMD java -javaagent:/opentelemetry-javaagent.jar -jar /application.jar "$@"
+```
+see: [policy-app: Dockerfile](policy-app/Dockerfile)
+
+
+Additionally, environment variables configure the behavior:
+
+```shell
+OTEL_SERVICE_NAME: policy-app
+OTEL_LOGS_EXPORTER: otlp
+OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
+OTEL_JAVAAGENT_DEBUG: false
+OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED: true
+```
+see: [docker/docker-compose-apps.yaml](docker/docker-compose-apps.yaml)
+
+### Limitations of the OpenTelemetry Java Agent
+
+While the OpenTelemetry Java Agent provides full automatic instrumentation, it does not support custom instrumentation out of the box. If you need to create custom spans, capture additional metadata, or manually instrument specific business logic, you must include the OpenTelemetry SDK as a dependency in the application.
+
+## Account App
+
+The Account App uses Micrometer and Micrometer Tracing, which are built into Spring Boot Actuator. Instead of relying on OpenTelemetry's Java Agent or Spring Boot Starter, this approach uses Micrometer as the abstraction layer for tracing and metrics.
+
+> Micrometer provides a facade for the most popular observability systems, allowing you to instrument your JVM-based application code without vendor lock-in. Think SLF4J, but for observability.
+
+see: [Micrometer Website](https://micrometer.io/).
+
+### How It Works
+- Micrometer handles both metrics and tracing.
+- Logs require manual configuration via Logback, as Micrometer does not handle logging.
+- A bridge is required to convert Micrometer Tracing data to OpenTelemetry’s OTLP protocol.
+
+### Dependencies
+The following dependencies are used in the Account App:
+
+#### Actuator & Micrometer Core
+Spring Boot Actuator provides built-in endpoints (e.g., `/actuator/health`, `/actuator/metrics`) and includes Micrometer Core & Micrometer Observation:
+
+```gradle
+implementation 'org.springframework.boot:spring-boot-starter-actuator'
+```
+
+#### Distributed Tracing
+To enable distributed tracing via Micrometer and export traces to OpenTelemetry, the following dependencies are included:
+
+```gradle
+// Micrometer Tracing Bridge for OTEL
+implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+
+// OTLP Exporter to send traces to OpenTelemetry Collector
+implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+
+// Required for @Observed annotation to activate tracing on specific methods
+implementation 'org.springframework.boot:spring-boot-starter-aop'
+```
+
+#### Logging (Logback)
+Since Micrometer does not handle logs, OpenTelemetry's Logback Appender is used to export logs to the OpenTelemetry Collector:
+
+```gradle
+implementation 'io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:1.32.1-alpha'
+```
+
+To properly integrate OpenTelemetry with Logback, a custom `logback.xml` configuration is required. This ensures that logs are both printed to the console and sent to the OpenTelemetry Collector with trace context.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="OpenTelemetry" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        <captureMdcAttributes>*</captureMdcAttributes>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="console"/>
+        <appender-ref ref="OpenTelemetry"/>
+    </root>
+</configuration>
+```
+
+This ensures that logs include tracing metadata such as `trace_id` and `span_id`.
+
+#### Metrics Export
+To export Micrometer metrics (counters, gauges, timers, etc.) to OpenTelemetry, the Micrometer OTLP Registry is used:
+
+```gradle
+implementation 'io.micrometer:micrometer-registry-otlp'
+```
+
+### Key Considerations
+- Micrometer only supports tracing and metrics, so log integration requires manual setup.
+- A bridge is necessary to convert Micrometer’s tracing data to OpenTelemetry’s OTLP format.
+- Unlike the OpenTelemetry Java Agent, this approach allows more control over what is instrumented but requires additional configuration.
+
+This approach is useful for applications that already use Micrometer and want to integrate with OpenTelemetry without fully switching to OpenTelemetry's SDK or Java Agent.
