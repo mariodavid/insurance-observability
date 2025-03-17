@@ -1,0 +1,28 @@
+plugins {
+    id 'java-library'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+archivesBaseName = 'partner-core'
+
+dependencies {
+
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+
+    implementation 'org.liquibase:liquibase-core'
+
+
+    runtimeOnly 'org.postgresql:postgresql'
+    // for using @Observed in Code
+    // NOTE: this also comes transitively from org.springframework:spring-context
+    implementation 'io.micrometer:micrometer-observation'
+
+
+}
+
+test {
+    useJUnitPlatform()
+}

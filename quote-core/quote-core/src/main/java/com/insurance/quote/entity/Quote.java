@@ -14,7 +14,6 @@ import com.insurance.common.entity.PaymentFrequency;
 import com.insurance.product.entity.InsuranceProduct;
 import com.insurance.product.entity.ProductType;
 import com.insurance.product.entity.ProductVariant;
-
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 
@@ -26,6 +25,9 @@ public class Quote {
     @Column(name = "ID", nullable = false)
     @Id
     private UUID id;
+    @Column(name = "PARTNER_NO", nullable = false)
+    @NotNull
+    private String partnerNo;
     @Column(name = "QUOTE_NO", nullable = false)
     @NotNull
     private String quoteNo;
@@ -67,6 +69,14 @@ public class Quote {
     @Column(name = "VALID_UNTIL", nullable = false)
     @NotNull
     private LocalDate validUntil;
+
+    public String getPartnerNo() {
+        return partnerNo;
+    }
+
+    public void setPartnerNo(String partnerNo) {
+        this.partnerNo = partnerNo;
+    }
 
     public String getCreatedPolicyId() {
         return createdPolicyId;

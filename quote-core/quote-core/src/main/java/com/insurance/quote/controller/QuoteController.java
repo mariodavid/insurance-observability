@@ -76,7 +76,7 @@ public class QuoteController {
         long quoteSequenceNumber = sequences.createNextValue(Sequence.withName("quote"));
         LocalDate today = timeSource.now().toLocalDate();
         quote.setQuoteNo("%s-%s".formatted(today.getYear(),quoteSequenceNumber));
-
+        quote.setPartnerNo("" + new Random().nextInt(1,11));
         quote.setStatus(QuoteStatus.PENDING);
 
         quote.setEffectiveDate(LocalDate.of(2024, 1, 1).plusDays((int)(Math.random() * 730)));

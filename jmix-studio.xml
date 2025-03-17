@@ -57,6 +57,19 @@
           </option>
         </ModuleSettings>
       </entry>
+      <entry key="com.insurance.app.partner-app.main">
+        <ModuleSettings>
+          <option name="dataStoreOptionsV2">
+            <map>
+              <entry key="main">
+                <value>
+                  <DataStoreSettingsV2 />
+                </value>
+              </entry>
+            </map>
+          </option>
+        </ModuleSettings>
+      </entry>
       <entry key="com.insurance.app.policy-app.main">
         <ModuleSettings>
           <option name="dataStoreOptionsV2">
@@ -87,6 +100,19 @@
                       <option value="postgres" />
                     </option>
                   </DataStoreSettingsV2>
+                </value>
+              </entry>
+            </map>
+          </option>
+        </ModuleSettings>
+      </entry>
+      <entry key="partner-core-addon.partner-core.main">
+        <ModuleSettings>
+          <option name="dataStoreOptionsV2">
+            <map>
+              <entry key="main">
+                <value>
+                  <DataStoreSettingsV2 />
                 </value>
               </entry>
             </map>

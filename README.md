@@ -356,6 +356,81 @@ To export Micrometer metrics (counters, gauges, timers, etc.) to OpenTelemetry, 
 implementation 'io.micrometer:micrometer-registry-otlp'
 ```
 
+## Partner App
+
+The Partner App is a pure API server built directly on Spring Boot. It provides partner data via REST endpoints, primarily used during insurance quote creation and policy viewing.
+
+#### Characteristics of the Approach
+
+The Partner App leverages a combination of **Micrometer** and the **OpenTelemetry Spring Boot Starter**. The main motivation behind this setup is to ensure that by using Micrometers `@Observed` (Observation API) within core components, it is still possible to decide on the final application to use Open Telemetry as the SDK (with its auto-instrumentation).
+
+This approach provides the following advantages:
+
+- **Leveraging existing Spring dependencies**:  
+  `micrometer-observation` is already included transitively via the `spring-context` dependency. Therefore, relying on Micrometer's Observation API (`@Observed`) in core libraries does not introduce additional dependencies—it's simply utilizing what's already available on the classpath.
+- **Use OpenTelemetry Naming Standard**: It is possible to leverage the standartised Open [Telementry semantic naming conventions](https://opentelemetry.io/docs/concepts/semantic-conventions/) while still using Micrometer for custom instrumentation.
+- **Use OpenTelemetry Auto Instrumentation**: In case of deciding to leverage the Open Telemetry auto-instrumentation (over the Micrometer based one), this combination is possible.
+
+
+### Dependencies
+
+The Partner App uses the following dependencies for observability:
+
+```gradle
+// OpenTelemetry Spring Boot Starter for automatic instrumentation
+implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+
+// Micrometer Observation API (for @Observed annotations)
+implementation 'io.micrometer:micrometer-observation'
+
+// Bridge between Micrometer Tracing API and OpenTelemetry
+implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+
+// OTLP Exporter to send telemetry data to OpenTelemetry Collector
+implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+
+// Enables AOP support for Micrometer Observations (@Observed annotations)
+implementation 'org.springframework.boot:spring-boot-starter-aop'
+```
+
+### Spring Configuration
+
+To enable the integration between Micrometer Observation API and OpenTelemetry in the Partner App, the following Spring configuration has been used:
+
+```java
+@Configuration
+public class ObservationConfig {
+
+    @Bean
+    public Tracer micrometerTracer(OpenTelemetry openTelemetry) {
+        return new OtelTracer(
+                openTelemetry.getTracer("partner-app"),
+                new OtelCurrentTraceContext(),
+                $ -> {} // noop event publisher
+        );
+    }
+
+    @Bean
+    public ObservationRegistry observationRegistry(Tracer tracer) {
+        ObservationRegistry registry = ObservationRegistry.create();
+        registry.observationConfig().observationHandler(new DefaultTracingObservationHandler(tracer));
+        return registry;
+    }
+
+    @Bean
+    public ObservedAspect observationAspect(ObservationRegistry registry) {
+        return new ObservedAspect(registry);
+    }
+}
+```
+
+This configuration explicitly registers the necessary Micrometer/OpenTelemetry bridging, ensuring that the @Observed annotations used in core components generate spans exported via OpenTelemetry.
+
+NOTE: Normally, this is what the `spring-boot-starter-actuator` module is doing, but in this case it is done manually to not rely on micrometer-core.
+
+Thus, this setup offers the best of both worlds: the widespread industry adoption of OpenTelemetry combined with the familiarity and ease of use of the Micrometer API.
+
+
 ## Observability Screenshots
 
 In the following screenshots, we demonstrate how OpenTelemetry and Micrometer Tracing integrate with Grafana for distributed tracing and log correlation. These insights help in debugging and performance optimization across microservices.

@@ -11,7 +11,6 @@ import jakarta.validation.constraints.NotNull;
 
 import com.insurance.common.entity.PaymentFrequency;
 import com.insurance.product.entity.InsuranceProduct;
-
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 
@@ -24,6 +23,9 @@ public class Policy {
     @Column(name = "ID", nullable = false)
     @Id
     private UUID id;
+    @Column(name = "PARTNER_NO", nullable = false)
+    @NotNull
+    private String partnerNo;
     @Column(name = "INSURANCE_PRODUCT", nullable = false)
     @NotNull
     private String insuranceProduct;
@@ -41,6 +43,14 @@ public class Policy {
     @Column(name = "PAYMENT_FREQUENCY", nullable = false)
     @NotNull
     private String paymentFrequency;
+
+    public String getPartnerNo() {
+        return partnerNo;
+    }
+
+    public void setPartnerNo(String partnerNo) {
+        this.partnerNo = partnerNo;
+    }
 
     public PaymentFrequency getPaymentFrequency() {
         return paymentFrequency == null ? null : PaymentFrequency.fromId(paymentFrequency);

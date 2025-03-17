@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.insurance.app'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+
+dependencyManagement {
+    imports {
+        mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.13.3")
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // -----------------------------------------------------------
+    // CORE Dependencies
+    // -----------------------------------------------------------
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+
+
+    // -----------------------------------------------------------
+    // OTel SB Starter
+    // -----------------------------------------------------------
+    // Automatic Open Telemetry Instrumentation via Spring Boot Starter
+    implementation "io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter"
+
+
+    // -----------------------------------------------------------
+    // ACTUATOR
+    // -----------------------------------------------------------
+    // we don't use micrometer via actuator
+    // implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // -----------------------------------------------------------
+    // DISTRIBUTED TRACING
+    // -----------------------------------------------------------
+
+    // We only use dependency for using @Observed in Code
+    // NOTE: this also comes transitively from org.springframework:spring-context
+    implementation 'io.micrometer:micrometer-observation'
+
+    // used to manually configure connection to O-Tel without actuator
+    implementation 'io.micrometer:micrometer-tracing'
+
+    // Micrometer Tracing Bridge for OTEL:
+    // Bridges the Micrometer Tracing API to the OpenTelemetry protocol.
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    // OTLP Exporter:
+    // Exports trace data using the OTLP protocol to your OpenTelemetry Collector.
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+    // for activating @Observed declared methods
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+
+    implementation 'com.insurance:partner-core-starter:0.0.1-SNAPSHOT'
+}

@@ -1,0 +1,30 @@
+
+###
+
+GET http://localhost:9403/partner/api/partners/10
+###
+
+GET http://localhost:9403/partner/api/partners?search=Mar&limit=10&offset=2
+###
+
+GET http://localhost:9403/partner/api/partners?search=10
+
+
+
+###
+
+GET http://localhost:9403/partner/actuator/metrics
+###
+
+GET http://localhost:9403/partner/actuator/metrics/account.balance.not_found
+
+###
+
+GET http://localhost:9403/partner/actuator/metrics/http.server.requests
+
+###
+
+GET http://localhost:9403/partner/actuator/info
+
+
+

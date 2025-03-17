@@ -57,6 +57,7 @@ public class QuoteService {
 
             CreatePolicyRequest request = new CreatePolicyRequest(
                     quote.getQuoteNo(),
+                    quote.getPartnerNo(),
                     quote.getInsuranceProduct().getId(),
                     quote.getEffectiveDate(),
                     quote.getCalculatedPremium(),

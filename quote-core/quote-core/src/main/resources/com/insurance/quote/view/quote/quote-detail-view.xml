@@ -23,9 +23,16 @@
                 <responsiveStep minWidth="0" columns="1"/>
                 <responsiveStep minWidth="40em" columns="2"/>
             </responsiveSteps>
-            <textField id="quoteNoField" property="quoteNo" readOnly="true" colspan="2"/>
+            <textField id="quoteNoField" property="quoteNo" readOnly="true"/>
             <datePicker id="validFromField" property="validFrom"/>
             <datePicker id="validUntilField" property="validUntil"/>
+            <hr colspan="2"/>
+            <entityComboBox id="partnerComboBox" label="msg://com.insurance.quote.partner/PartnerDto" metaClass="quote_PartnerDto" required="true">
+                <actions>
+                    <action id="entityClear" type="entity_clear"/>
+                </actions>
+            </entityComboBox>
+            <textField id="partnerNoField" property="partnerNo" readOnly="true"/>
             <hr colspan="2"/>
             <select id="productTypeField" property="productType"/>
             <select id="productVariantField" property="productVariant"/>

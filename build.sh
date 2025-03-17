@@ -10,3 +10,6 @@ set -e
 
 ./gradlew :account-core:account-core:clean :account-app:clean
 ./gradlew -Pvaadin.productionMode=true :account-app:bootJar --no-build-cache
+
+./gradlew :partner-core:partner-core:clean :partner-app:clean
+./gradlew -Pvaadin.productionMode=true :partner-app:bootJar --no-build-cache

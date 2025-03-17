@@ -8,6 +8,7 @@
             <fetchPlan extends="_base"/>
             <loader id="policyDl"/>
         </instance>
+        <instance id="partnerDc" class="com.insurance.policy.partner.PartnerDto" />
     </data>
     <facets>
         <dataLoadCoordinator auto="true"/>
@@ -18,7 +19,7 @@
     </actions>
     <layout>
         <hbox>
-            <details themeNames="filled" summaryText="msg://policyDetails" opened="true">
+            <details themeNames="filled" summaryText="msg://policyDetails" opened="true" width="100%">
             <formLayout id="form" dataContainer="policyDc">
                 <responsiveSteps>
                     <responsiveStep minWidth="0" columns="1"/>
@@ -32,16 +33,25 @@
                 <select id="paymentFrequencyField" property="paymentFrequency" readOnly="true"/>
             </formLayout>
             </details>
-            <details themeNames="filled" summaryText="msg://accountBalance" opened="true">
-                <vbox width="100%">
-                    <datePicker id="accountBalanceEffectiveDatePicker" label="msg://effectiveDate"/>
-                    <textField id="accountBalanceResult" label="msg://accountBalance" readOnly="true">
-                        <suffix>
-                            <span text="msg://eur"/>
-                        </suffix>
-                    </textField>
-                </vbox>
-            </details>
+            <vbox padding="false" width="300px">
+                <details themeNames="filled" summaryText="msg://policyHolder" opened="true" width="100%">
+                    <formLayout id="partnerForm" dataContainer="partnerDc" width="100%">
+                        <textField id="partnerNoField" property="partnerNo" readOnly="true"/>
+                        <textField id="firstNameField" property="firstName" readOnly="true"/>
+                        <textField id="lastNameField" property="lastName" readOnly="true"/>
+                    </formLayout>
+                </details>
+                <details themeNames="filled" summaryText="msg://accountBalance" opened="true" width="100%">
+                    <vbox width="100%">
+                        <datePicker id="accountBalanceEffectiveDatePicker" label="msg://effectiveDate"/>
+                        <textField id="accountBalanceResult" label="msg://accountBalance" readOnly="true">
+                            <suffix>
+                                <span text="msg://eur"/>
+                            </suffix>
+                        </textField>
+                    </vbox>
+                </details>
+            </vbox>
         </hbox>
         <hbox id="detailActions">
             <button id="saveAndCloseButton" action="saveAction"/>

@@ -8,4 +8,5 @@
           description="msg://com.insurance.common/menu_config.PolicyAppNavigation_navigate.description"
           title="msg://com.insurance.common/menu_config.PolicyAppNavigation_navigate.title"/>
     <item view="account_Account.list" title="msg://com.insurance.account.view.account/accountListView.title"/>
+
 </menu-config>

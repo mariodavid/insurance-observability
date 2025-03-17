@@ -56,7 +56,7 @@ public class PolicyController {
 
             try {
                 log.debug("Preconditions for policy creation fulfilled. Continuing with policy creation");
-                Policy policy = policyService.createPolicy(product, request.effectiveDate(), paymentFrequency, request.premium());
+                Policy policy = policyService.createPolicy(product, request.effectiveDate(), paymentFrequency, request.premium(), request.partnerNo());
 
                 MDC.put(CommonMdc.POLICY_NO.getId(), policy.getPolicyNo());
                 MDC.put(CommonMdc.POLICY_ID.getId(), policy.getId().toString());

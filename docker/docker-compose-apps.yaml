@@ -50,6 +50,20 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  partner:
+    build:
+      context: ../partner-app
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/partner
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
+    ports:
+      - "9403:9403"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 networks:
   default:
     name: insurance-observability

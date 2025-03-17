@@ -14,6 +14,7 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
 
     // for using @Observed in Code
+    // NOTE: this also comes transitively from org.springframework:spring-context
     implementation 'io.micrometer:micrometer-observation'
 
 

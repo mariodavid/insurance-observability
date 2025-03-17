@@ -1,0 +1,29 @@
+### Sending a manual Trace to OTEL-Collector
+
+# curl -X GET "http://host.docker.internal:9090/api/v1/label/__name__/values"
+GET http://host.docker.internal:9090/api/v1/label/__name__/values
+
+###
+
+# curl -X GET "http://host.docker.internal:9090/api/v1/status/runtimeinfo"
+GET http://host.docker.internal:9090/api/v1/status/runtimeinfo
+
+###
+
+# curl -X GET "http://host.docker.internal:9090/api/v1/query?query=account_balance_not_found_total"
+GET http://host.docker.internal:9090/api/v1/query?query=account_balance_not_found_total
+
+###
+
+# curl -X GET "http://host.docker.internal:9090/api/v1/query?query=http_server_requests"
+GET http://host.docker.internal:9090/api/v1/query?query=http_server_requests
+
+###
+
+
+# curl -X GET "http://host.docker.internal:9090/api/v1/status/config"
+GET http://host.docker.internal:9090/api/v1/status/config
+
+###
+
+

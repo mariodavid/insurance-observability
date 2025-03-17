@@ -1,6 +1,7 @@
 package com.insurance.policy.view.policy;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -8,13 +9,22 @@ import com.insurance.policy.account.AccountBalanceResponse;
 import com.insurance.policy.account.AccountClient;
 import com.insurance.policy.entity.Policy;
 
+import com.insurance.policy.partner.PartnerClient;
+import com.insurance.policy.partner.PartnerDto;
+import com.insurance.policy.partner.PartnerResponse;
 import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import io.jmix.core.DataManager;
+import io.jmix.core.Metadata;
 import io.jmix.core.TimeSource;
+import io.jmix.flowui.Notifications;
 import io.jmix.flowui.component.datepicker.TypedDatePicker;
+import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.DefaultMainViewParent;
 import io.jmix.flowui.view.EditedEntityContainer;
+import io.jmix.flowui.view.MessageBundle;
 import io.jmix.flowui.view.StandardDetailView;
 import io.jmix.flowui.view.Subscribe;
 import io.jmix.flowui.view.ViewComponent;
@@ -34,10 +44,39 @@ public class PolicyDetailView extends StandardDetailView<Policy> {
     private TypedDatePicker<LocalDate> accountBalanceEffectiveDatePicker;
     @Autowired
     private TimeSource timeSource;
+    @Autowired
+    private PartnerClient partnerClient;
+    @Autowired
+    private Metadata metadata;
+    @ViewComponent
+    private InstanceContainer<PartnerDto> partnerDc;
+    @Autowired
+    private Notifications notifications;
+    @ViewComponent
+    private MessageBundle messageBundle;
 
     @Subscribe
     public void onReady(final ReadyEvent event) {
         accountBalanceEffectiveDatePicker.setValue(timeSource.now().toLocalDate());
+
+        PartnerResponse partnerResponse = partnerClient.getPartner(getEditedEntity().getPartnerNo());
+
+        if (partnerResponse != null) {
+            PartnerDto partnerDto = metadata.create(PartnerDto.class);
+            partnerDto.setId(UUID.fromString(partnerResponse.partnerId()));
+            partnerDto.setPartnerNo(partnerResponse.partnerNo());
+            partnerDto.setFirstName(partnerResponse.firstName());
+            partnerDto.setLastName(partnerResponse.lastName());
+
+            partnerDc.setItem(partnerDto);
+        }
+        else {
+            notifications.create(messageBundle.getMessage("noPartner"))
+                    .withType(Notifications.Type.WARNING)
+                    .withPosition(Notification.Position.TOP_END)
+                    .show();
+        }
+
     }
 
 
@@ -46,7 +85,15 @@ public class PolicyDetailView extends StandardDetailView<Policy> {
 
         AccountBalanceResponse accountBalance = accountClient.getAccountBalance(getEditedEntity().getPolicyNo(), event.getValue());
 
-        accountBalanceResult.setValue(accountBalance.balance().toString());
+        if (accountBalance != null) {
+            accountBalanceResult.setValue(accountBalance.balance().toString());
+        }
+        else {
+            notifications.create(messageBundle.getMessage("noAccountBalance"))
+                    .withType(Notifications.Type.WARNING)
+                    .withPosition(Notification.Position.TOP_END)
+                    .show();
+        }
 
     }
 

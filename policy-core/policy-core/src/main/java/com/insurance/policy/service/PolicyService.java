@@ -38,7 +38,7 @@ public class PolicyService {
         this.policyCreatedTopic = policyCreatedTopic;
     }
 
-    public Policy createPolicy(InsuranceProduct insuranceProduct, LocalDate policyCoverageStart, PaymentFrequency paymentFrequency, BigDecimal premium) {
+    public Policy createPolicy(InsuranceProduct insuranceProduct, LocalDate policyCoverageStart, PaymentFrequency paymentFrequency, BigDecimal premium, String partnerNo) {
 
         log.debug("Starting policy creation");
         long policySequenceNumber = sequences.createNextValue(Sequence.withName("policy"));
@@ -48,6 +48,7 @@ public class PolicyService {
 
         Policy policy = dataManager.create(Policy.class);
         policy.setPolicyNo(policyNo);
+        policy.setPartnerNo(partnerNo);
         policy.setInsuranceProduct(insuranceProduct);
         policy.setCoverageStart(policyCoverageStart);
         policy.setPaymentFrequency(paymentFrequency);
