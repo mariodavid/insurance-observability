@@ -68,7 +68,7 @@ echo "127.0.0.1 host.docker.internal" | sudo tee -a /etc/hosts
 Spinning up the observability docker containers:
 
 ```shell
-docker compose -f docker/docker-compose-infra.yaml -f docker/docker-compose-observability.yaml up -d
+docker compose -p insurance-observability -f docker/docker-compose-infra.yaml -f docker/docker-compose-observability.yaml up -d
 ```
 
 #### 2. Build application
@@ -80,7 +80,7 @@ docker compose -f docker/docker-compose-infra.yaml -f docker/docker-compose-obse
 #### 3. Start application
 
 ```shell
-docker compose -f docker/docker-compose-apps.yaml up --build -d
+docker compose -p insurance-observability -f docker/docker-compose-apps.yaml up --build -d
 ```
 
 #### 4. Open Apps
