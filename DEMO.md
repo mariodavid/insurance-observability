@@ -61,6 +61,3 @@
   - Select an account balance with a future date (e.g., 2029)![7-1.png](img/demo/7-1.png)
   - Go to Grafana and search for the TraceID![7-2.png](img/demo/7-2.png)
   - Examine the error details and stack trace in the trace view![7-3.png](img/demo/7-3.png)
-
-
-* Metrics (?)
