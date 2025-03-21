@@ -17,6 +17,10 @@ dependencies {
     testRuntimeOnly 'org.hsqldb:hsqldb'
     api 'com.insurance:common-starter:0.0.1-SNAPSHOT'
     api 'com.insurance:product-core-starter:0.0.1-SNAPSHOT'
+
+    // OTel-API is used to get current trace ID for user error messages
+    implementation"io.opentelemetry:opentelemetry-api:1.48.0"
+
 }
 
 configurations.implementation {

@@ -68,6 +68,7 @@ public class PolicyCreatedListener {
         FetchPolicyResponse fetchPolicyResponse = policyClient.fetchPolicy(event.policyId());
 
         Account account = accountService.createAccount(
+                event.policyId(),
                 fetchPolicyResponse.policyNo(),
                 fetchPolicyResponse.coverageStart(),
                 fetchPolicyResponse.premium(),

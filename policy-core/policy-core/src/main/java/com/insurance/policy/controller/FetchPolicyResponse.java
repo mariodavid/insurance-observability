@@ -11,6 +11,7 @@ public record FetchPolicyResponse(
         String policyId,
         String policyNo,
         LocalDate coverageStart,
+        LocalDate coverageEnd,
         BigDecimal premium,
         PaymentFrequency paymentFrequency
 ) {}

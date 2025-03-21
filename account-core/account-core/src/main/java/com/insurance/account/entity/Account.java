@@ -26,6 +26,9 @@ public class Account {
     @Column(name = "ID", nullable = false)
     @Id
     private UUID id;
+    @Column(name = "POLICY_ID", nullable = false)
+    @NotNull
+    private String policyId;
     @Column(name = "ACCOUNT_NO", nullable = false)
     @NotNull
     private String accountNo;
@@ -36,6 +39,14 @@ public class Account {
     @Composition
     @OneToMany(mappedBy = "account")
     private List<AccountDocument> documents;
+
+    public String getPolicyId() {
+        return policyId;
+    }
+
+    public void setPolicyId(String policyId) {
+        this.policyId = policyId;
+    }
 
     public List<AccountDocument> getDocuments() {
         return documents;

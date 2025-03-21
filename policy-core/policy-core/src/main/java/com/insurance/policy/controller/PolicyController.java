@@ -92,6 +92,7 @@ public class PolicyController {
                     foundPolicy.getId().toString(),
                     foundPolicy.getPolicyNo(),
                     foundPolicy.getCoverageStart(),
+                    foundPolicy.getCoverageEnd(),
                     foundPolicy.getPremium(),
                     foundPolicy.getPaymentFrequency()
             );

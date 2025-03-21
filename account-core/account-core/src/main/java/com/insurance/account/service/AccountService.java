@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import com.insurance.account.entity.Account;
 import com.insurance.account.entity.AccountDocument;
 import com.insurance.account.entity.DocumentType;
+import com.insurance.account.policy.FetchPolicyResponse;
+import com.insurance.account.policy.PolicyClient;
 import com.insurance.common.entity.PaymentFrequency;
 
 import io.jmix.core.DataManager;
@@ -30,20 +32,23 @@ public class AccountService {
     private static final Logger log = LoggerFactory.getLogger(AccountService.class);
     private final DataManager dataManager;
     private final Validator validator;
+    private final PolicyClient policyClient;
 
-    public AccountService(DataManager dataManager, Validator validator) {
+    public AccountService(DataManager dataManager, Validator validator, PolicyClient policyClient) {
         this.dataManager = dataManager;
         this.validator = validator;
+        this.policyClient = policyClient;
     }
 
 
-    public Account createAccount(String accountNo, LocalDate coverageStart, BigDecimal premium, PaymentFrequency paymentFrequency) {
+    public Account createAccount(String policyId, String accountNo, LocalDate coverageStart, BigDecimal premium, PaymentFrequency paymentFrequency) {
 
         log.info("Creating account {}", accountNo);
         Account account = dataManager.create(Account.class);
 
         SaveContext saveContext = new SaveContext();
 
+        account.setPolicyId(policyId);
         account.setAccountNo(accountNo);
         account.setAccountBalance(premium.negate());
 
@@ -108,7 +113,15 @@ public class AccountService {
             return Optional.empty();
         }
 
-        BigDecimal computedBalance = potentialAccount.get().getDocuments().stream()
+
+        Account account = potentialAccount.get();
+        FetchPolicyResponse fetchPolicyResponse = policyClient.fetchPolicy(account.getPolicyId());
+
+        if (fetchPolicyResponse.coverageEnd().isBefore(effectiveDate)) {
+            throw new AccountBalanceCalculationNotPossibleException("Account balance calculation not possible. Coverage end is before effectiveDate " + effectiveDate);
+        }
+
+        BigDecimal computedBalance = account.getDocuments().stream()
                 .filter(doc -> !doc.getDocumentDate().isAfter(effectiveDate))
                 .map(AccountDocument::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -116,4 +129,5 @@ public class AccountService {
         log.debug("Computed balance for accountNo {}: {}", accountNo, computedBalance);
         return Optional.of(computedBalance);
     }
+
 }

@@ -56,6 +56,11 @@
     ![6-3.png](img/demo/6-3.png)
   - Filter logs based on spans and traces
 
-TODO:
-* Exceptions in Grafana (create example case)
+7. **Exception Handling and Debugging with Traces**
+  - Open a policy and navigate to the detailed view 
+  - Select an account balance with a future date (e.g., 2029)![7-1.png](img/demo/7-1.png)
+  - Go to Grafana and search for the TraceID![7-2.png](img/demo/7-2.png)
+  - Examine the error details and stack trace in the trace view![7-3.png](img/demo/7-3.png)
+
+
 * Metrics (?)
