@@ -452,16 +452,6 @@ The TXO App focuses on explicitly managing the trace context:
 
 This approach guarantees that even delayed or out-of-process executions can be correlated within distributed traces.
 
-### Dependencies
-
-The application relies on Micrometer Tracing and the Observation API:
-
-```gradle
-implementation 'io.micrometer:micrometer-tracing-bridge-otel'
-implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
-implementation 'org.springframework.boot:spring-boot-starter-aop'
-implementation 'org.springframework.boot:spring-boot-starter-quartz'
-
 
 
 ## Observability Screenshots
