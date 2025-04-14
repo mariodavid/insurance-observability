@@ -430,6 +430,39 @@ NOTE: Normally, this is what the `spring-boot-starter-actuator` module is doing,
 
 Thus, this setup offers the best of both worlds: the widespread industry adoption of OpenTelemetry combined with the familiarity and ease of use of the Micrometer API.
 
+## TXO App
+
+The TXO App is a simplified transactional outbox example, built with Spring Boot and Micrometer. It demonstrates how to extract, persist, and later restore trace context to ensure trace continuity across asynchronous message processing.
+
+### Purpose
+
+- The Policy App sends HTTP requests to the TXO App (in production this would be by using the policy DB in a shared fashion).
+- The TXO App persists both the payload and the trace context (`traceparent`) in the database.
+- A scheduled Quartz job reads the stored entries and publishes them to Kafka, restoring the original trace context to ensure proper span continuation.
+
+### Trace Context Handling
+
+The TXO App focuses on explicitly managing the trace context:
+
+- **MicrometerTraceparentSupplier**  
+  Extracts the current `traceparent` from the active context and serializes it into a string for storage.
+
+- **MicrometerTraceparentContextWrapper**  
+  Reads the stored `traceparent`, reconstructs the trace context, and wraps downstream operations (like publishing to Kafka) in the restored scope. This ensures that asynchronous processes are linked back to the original trace.
+
+This approach guarantees that even delayed or out-of-process executions can be correlated within distributed traces.
+
+### Dependencies
+
+The application relies on Micrometer Tracing and the Observation API:
+
+```gradle
+implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+implementation 'org.springframework.boot:spring-boot-starter-aop'
+implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
+
 
 ## Observability Screenshots
 

@@ -13,3 +13,6 @@ set -e
 
 ./gradlew :partner-core:partner-core:clean :partner-app:clean
 ./gradlew -Pvaadin.productionMode=true :partner-app:bootJar --no-build-cache
+
+./gradlew :txo-publisher-core:txo-publisher-core:clean :txo-publisher-app:clean
+./gradlew -Pvaadin.productionMode=true :txo-publisher-app:bootJar --no-build-cache

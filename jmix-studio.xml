@@ -106,6 +106,24 @@
           </option>
         </ModuleSettings>
       </entry>
+      <entry key="com.insurance.txo-publisher-app.main">
+        <ModuleSettings>
+          <option name="dataStoreOptionsV2">
+            <map>
+              <entry key="main">
+                <value>
+                  <DataStoreSettingsV2>
+                    <option name="generateDdlType" value="CREATE_AND_UPDATE" />
+                    <option name="supportedTypes">
+                      <option value="postgres" />
+                    </option>
+                  </DataStoreSettingsV2>
+                </value>
+              </entry>
+            </map>
+          </option>
+        </ModuleSettings>
+      </entry>
       <entry key="partner-core-addon.partner-core.main">
         <ModuleSettings>
           <option name="dataStoreOptionsV2">
@@ -159,6 +177,19 @@
         </ModuleSettings>
       </entry>
       <entry key="quote-core-addon.quote-core.main">
+        <ModuleSettings>
+          <option name="dataStoreOptionsV2">
+            <map>
+              <entry key="main">
+                <value>
+                  <DataStoreSettingsV2 />
+                </value>
+              </entry>
+            </map>
+          </option>
+        </ModuleSettings>
+      </entry>
+      <entry key="txo-publisher-core-addon.txo-publisher-core.main">
         <ModuleSettings>
           <option name="dataStoreOptionsV2">
             <map>

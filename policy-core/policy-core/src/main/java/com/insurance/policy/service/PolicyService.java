@@ -2,8 +2,8 @@ package com.insurance.policy.service;
 
 import com.insurance.common.entity.PaymentFrequency;
 import com.insurance.policy.entity.Policy;
-import com.insurance.policy.kafka.PolicyCreatedMessage;
-import com.insurance.policy.kafka.PolicyCreatedTopic;
+import com.insurance.policy.notification.PolicyCreatedMessage;
+import com.insurance.policy.notification.PolicyCreatedNotifier;
 import com.insurance.product.entity.InsuranceProduct;
 import io.jmix.core.DataManager;
 import io.jmix.data.Sequence;
@@ -12,6 +12,7 @@ import io.jmix.data.Sequences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -29,15 +30,16 @@ public class PolicyService {
     private final DataManager dataManager;
     private final Sequences sequences;
     private final Validator validator;
-    private final PolicyCreatedTopic policyCreatedTopic;
+    private final PolicyCreatedNotifier policyCreatedNotifier;
 
-    public PolicyService(DataManager dataManager, Sequences sequences, Validator validator, PolicyCreatedTopic policyCreatedTopic) {
+    public PolicyService(DataManager dataManager, Sequences sequences, Validator validator, PolicyCreatedNotifier policyCreatedNotifier) {
         this.dataManager = dataManager;
         this.sequences = sequences;
         this.validator = validator;
-        this.policyCreatedTopic = policyCreatedTopic;
+        this.policyCreatedNotifier = policyCreatedNotifier;
     }
 
+    @Transactional
     public Policy createPolicy(InsuranceProduct insuranceProduct, LocalDate policyCoverageStart, PaymentFrequency paymentFrequency, BigDecimal premium, String partnerNo) {
 
         log.debug("Starting policy creation");
@@ -73,8 +75,7 @@ public class PolicyService {
         Policy savedPolicy = dataManager.save(policy);
         log.debug("Policy saving successful");
 
-        policyCreatedTopic.publish(new PolicyCreatedMessage(savedPolicy.getId().toString(), savedPolicy.getPolicyNo()));
-
+        policyCreatedNotifier.notify(new PolicyCreatedMessage(savedPolicy.getId().toString(), savedPolicy.getPolicyNo()));
         return savedPolicy;
 
     }

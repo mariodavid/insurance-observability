@@ -11,7 +11,6 @@ import org.springframework.context.annotation.PropertySource;
 
 import com.insurance.common.CommonConfiguration;
 import com.insurance.product.ProductConfiguration;
-
 import io.jmix.core.annotation.JmixModule;
 import io.jmix.core.impl.scanning.AnnotationScanMetadataReaderFactory;
 import io.jmix.eclipselink.EclipselinkConfiguration;

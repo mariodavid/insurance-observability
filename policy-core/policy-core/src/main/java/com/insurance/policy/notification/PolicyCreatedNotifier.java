@@ -1,33 +1,35 @@
-package com.insurance.policy.kafka;
+package com.insurance.policy.notification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.insurance.policy.txo.TxoPublisherClient;
 
 @Component
-public class PolicyCreatedTopic {
+public class PolicyCreatedNotifier {
 
-    private static final Logger log = LoggerFactory.getLogger(PolicyCreatedTopic.class);
+    private static final Logger log = LoggerFactory.getLogger(PolicyCreatedNotifier.class);
     private final String topicName;
-    private final KafkaTemplate<String,Object> kafkaTemplate;
     private final ObjectMapper objectMapper;
+    private final TxoPublisherClient txoPublisherClient;
 
-    public PolicyCreatedTopic(@Value("${policy.topic.policy-created}") String topicName, KafkaTemplate kafkaTemplate, ObjectMapper objectMapper) {
+
+    public PolicyCreatedNotifier(
+            @Value("${policy.topic.policy-created}") String topicName, ObjectMapper objectMapper, TxoPublisherClient txoPublisherClient) {
         this.topicName = topicName;
-        this.kafkaTemplate = kafkaTemplate;
         this.objectMapper = objectMapper;
+        this.txoPublisherClient = txoPublisherClient;
     }
 
-    public void publish(PolicyCreatedMessage policyCreatedMessage) {
+    public void notify(PolicyCreatedMessage policyCreatedMessage) {
         try {
-            log.debug("Publishing message to topic {}", policyCreatedMessage);
+            log.debug("Notifying about policy created {}", policyCreatedMessage);
             String messageBody = objectMapper.writeValueAsString(policyCreatedMessage);
-            kafkaTemplate.send(topicName, messageBody);
+            txoPublisherClient.publishMessage(topicName, messageBody);
         } catch (JsonProcessingException e) {
             log.error("Error while sending message to topic {}: {}", topicName, policyCreatedMessage, e);
             throw new RuntimeException(e);

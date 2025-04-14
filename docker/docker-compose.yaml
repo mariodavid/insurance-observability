@@ -1,8 +1,56 @@
 services:
+  postgres:
+    build:
+      context: ./postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5433:5432"
+
+  redpanda:
+    image: redpandadata/redpanda:v24.3.2
+    command:
+      - redpanda start
+      - --kafka-addr internal://0.0.0.0:9093,external://0.0.0.0:9092
+      - --advertise-kafka-addr internal://host.docker.internal:9092,external://host.docker.internal:9092
+      - --smp 1
+      - --mode dev-container
+      - --memory 512M
+    healthcheck:
+      test: [ "CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    ports:
+      - "9092:9092"
+
+  redpanda-console:
+    image: redpandadata/console:v2.7.2
+    environment:
+      KAFKA_BROKERS: redpanda:9093
+    ports:
+      - "9404:8080"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8080/api/brokers" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
   policy:
     build:
       context: ../policy-app
       dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "9401:9401"
     extra_hosts:
@@ -23,6 +71,9 @@ services:
     build:
       context: ../quote-app
       dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       MAIN_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/quote
       MAIN_DATASOURCE_USERNAME: postgres
@@ -37,6 +88,9 @@ services:
     build:
       context: ../account-app
       dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       MAIN_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/account
       MAIN_DATASOURCE_USERNAME: postgres
@@ -54,6 +108,9 @@ services:
     build:
       context: ../partner-app
       dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/partner
       SPRING_DATASOURCE_USERNAME: postgres
@@ -61,6 +118,23 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
     ports:
       - "9403:9403"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  txo:
+    build:
+      context: ../txo-publisher-app
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5433/txo
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://host.docker.internal:4318
+    ports:
+      - "9405:9405"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

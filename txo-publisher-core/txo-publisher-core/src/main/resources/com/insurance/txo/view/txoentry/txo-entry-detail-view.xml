@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://txoEntryDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="txoEntryDc"
+                  class="com.insurance.txo.entity.TxoEntry">
+            <fetchPlan extends="_base"/>
+            <loader id="txoEntryDl"/>
+        </instance>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="saveAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout>
+        <formLayout id="form" dataContainer="txoEntryDc">
+            <responsiveSteps>
+                <responsiveStep minWidth="0" columns="1"/>
+                <responsiveStep minWidth="40em" columns="2"/>
+            </responsiveSteps>
+            <select id="statusField" property="status"/>
+            <textField id="traceIdField" property="traceId"/>
+            <textField id="eventDataField" property="eventData"/>
+            <textField id="eventTopicField" property="eventTopic"/>
+        </formLayout>
+        <hbox id="detailActions">
+            <button id="saveAndCloseButton" action="saveAction"/>
+            <button id="closeButton" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>

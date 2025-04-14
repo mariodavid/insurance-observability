@@ -3,7 +3,7 @@
 set -e
 set -u
 
-POSTGRES_DATABASES=("quote" "policy" "account" "partner")
+POSTGRES_DATABASES=("quote" "policy" "account" "partner" "txo")
 
 for db in "${POSTGRES_DATABASES[@]}"; do
     echo "Creating database $db"

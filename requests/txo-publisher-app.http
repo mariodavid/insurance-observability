@@ -1,0 +1,10 @@
+POST http://localhost:9405/txo/api/publish/my-topic
+Content-Type: application/json
+
+{
+  "foo": "bar1",
+  "faz":"baz"
+}
+
+
+

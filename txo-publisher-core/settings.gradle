@@ -1,0 +1,8 @@
+rootProject.name = 'txo-publisher-core-addon'
+
+include 'txo-publisher-core'
+include 'txo-publisher-core-starter'
+
+rootProject.children.each { p1 ->
+    p1.buildFileName = "${p1.name}.gradle"
+}

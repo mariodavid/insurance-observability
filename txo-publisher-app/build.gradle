@@ -1,0 +1,105 @@
+plugins {
+    id 'io.jmix' version '2.5.1'
+    id 'java'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.9'
+}
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'com.vaadin'
+
+jmix {
+    bomVersion = '2.5.1'
+}
+
+group = 'com.insurance'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://global.repo.jmix.io/repository/public'
+    }
+}
+
+dependencies {
+    implementation 'io.jmix.core:jmix-core-starter'
+    implementation 'io.jmix.data:jmix-eclipselink-starter'
+    implementation 'io.jmix.security:jmix-security-starter'
+    implementation 'io.jmix.security:jmix-security-flowui-starter'
+    implementation 'io.jmix.security:jmix-security-data-starter'
+    implementation 'io.jmix.localfs:jmix-localfs-starter'
+    implementation 'io.jmix.flowui:jmix-flowui-starter'
+    implementation 'io.jmix.flowui:jmix-flowui-data-starter'
+    implementation 'io.jmix.flowui:jmix-flowui-themes'
+    implementation 'io.jmix.datatools:jmix-datatools-starter'
+    implementation 'io.jmix.datatools:jmix-datatools-flowui-starter'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+
+    // -----------------------------------------------------------
+    // ACTUATOR
+    // -----------------------------------------------------------
+    // Spring Boot Actuator provides built-in endpoints (e.g. /actuator/health,
+    // /actuator/metrics, etc.) for monitoring and management.
+    // --> includes also micrometer core & micrometer observation
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // -----------------------------------------------------------
+    // DISTRIBUTED TRACING
+    // -----------------------------------------------------------
+    // Micrometer Tracing Bridge for OTEL:
+    // Bridges the Micrometer Tracing API to the OpenTelemetry protocol.
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    // OTLP Exporter:
+    // Exports trace data using the OTLP protocol to your OpenTelemetry Collector.
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+    // for activating @Observed declared methods
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // -----------------------------------------------------------
+    // LOGGING EXPORT (LOGBACK)
+    // -----------------------------------------------------------
+    // OpenTelemetry Logback Appender:
+    // This appender sends log events (including MDC attributes such as trace_id, span_id, etc.)
+    // to the OpenTelemetry Collector.
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:1.32.1-alpha'
+
+    // -----------------------------------------------------------
+    // METRICS EXPORT
+    // -----------------------------------------------------------
+    // Micrometer OTLP Registry:
+    // Exports Micrometer metrics (counters, gauges, timers, etc.) to the OpenTelemetry Collector.
+    // micrometer OTLP registry for exporting metrics to Otel-Collector (basically the same as the bridge for tracing)
+    implementation 'io.micrometer:micrometer-registry-otlp'
+
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'io.jmix.flowui:jmix-flowui-test-assist'
+    implementation 'com.insurance:txo-publisher-core-starter:0.0.1-SNAPSHOT'
+    implementation 'org.postgresql:postgresql'
+    implementation 'io.jmix.quartz:jmix-quartz-flowui-starter'
+    implementation 'io.jmix.quartz:jmix-quartz-starter'
+}
+
+configurations.implementation {
+    exclude group: 'com.vaadin', module: 'hilla'
+    exclude group: 'com.vaadin', module: 'hilla-dev'
+    exclude group: 'com.vaadin', module: 'copilot'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+idea {
+    module {
+        excludeDirs.addAll(files '.jmix', 'node_modules', 'src/main/frontend/generated/', 'src/main/bundles')
+    }
+}
+
+vaadin {
+    optimizeBundle = false
+}
